@@ -5,9 +5,7 @@ using UnityEngine;
 public class BirdMovement : MonoBehaviour {
 
     Vector3 velocity = Vector3.zero;
-    public Vector3 gravity;
-    public Vector3 flapVelocity;
-    public float maxSpeed = 5f;
+    float flapSpeed = 100f;
     public float forwardSpeed = 1f;
 
     bool didFlap = false;
@@ -19,30 +17,21 @@ public class BirdMovement : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        velocity.x = forwardSpeed;
-        velocity += gravity * Time.deltaTime;
-           
+        Rigidbody2D birdRigidBody2D = GetComponent<Rigidbody2D>();
+        birdRigidBody2D.AddForce(Vector2.right * forwardSpeed);
+        
         if (didFlap)
         {
+            birdRigidBody2D.AddForce(Vector2.up * flapSpeed);
             didFlap = false;
-            if (velocity.y < 0)
-            {
-                velocity.y = 0;
-            }
-            velocity += flapVelocity;
         }
 
-        velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
-
-        transform.position += velocity * Time.deltaTime;
-
-        float angle = 0;
-        if (velocity.y < 0)
-        {
-            angle = Mathf.Lerp(0, -90, -velocity.y / maxSpeed);
+        if (birdRigidBody2D.velocity.y > 0) {
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+        } else {
+            float angle = Mathf.Lerp(0, -90, -birdRigidBody2D.velocity.y / 4f);
+            transform.rotation = Quaternion.Euler(0, 0, angle);
         }
-        Quaternion look = Quaternion.Euler(0, 0, angle);
-        transform.rotation = Quaternion.Lerp(transform.rotation, look, Time.deltaTime * 6);
     }
 
     // Update is called once per frame
