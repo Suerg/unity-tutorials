@@ -8,12 +8,17 @@ public class Player : MonoBehaviour {
     private Animator myAnimator;
     private bool facingRight;
     private bool isAttacking;
+    private bool isSliding;
 
     [SerializeField]
     private float movementSpeed;
 
     private bool IsPlayerAttack() {
-        return myAnimator.GetCurrentAnimatorStateInfo(0).IsName("PlayerAttack");
+        return myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("PlayerAttack");
+    }
+
+    private bool IsPlayerSlide() {
+        return myAnimator.GetCurrentAnimatorStateInfo(0).IsName("PlayerSlide");
     }
 
 	// Use this for initialization
@@ -36,8 +41,7 @@ public class Player : MonoBehaviour {
 	}
 
     private void HandleMovement(float horizontal) {
-        if (!IsPlayerAttack()) {
-            Debug.Log("moving");
+        if (!myAnimator.GetBool("slide") && !IsPlayerAttack()) {
             float xSpeed = horizontal * movementSpeed;
             myRigidbody.velocity = new Vector2(xSpeed,
                 myRigidbody.velocity.y);
@@ -47,18 +51,27 @@ public class Player : MonoBehaviour {
             || (!facingRight && horizontal > 0)) {
             Flip();
         }
+        if (isSliding && !IsPlayerSlide()) {
+            myAnimator.SetBool("slide", true);
+
+        } else if (!IsPlayerSlide()) {
+            myAnimator.SetBool("slide", false);
+        }
     }
 
     private void HandleAttacks() {
        if (isAttacking && !IsPlayerAttack()) {
             myAnimator.SetTrigger("attack");
-            myRigidbody.velocity = Vector2.zero;
+            StopMoving();
         } 
     }
 
     private void HandleInput() {
         if (Input.GetButtonDown("Melee")) {
             isAttacking = true;
+        }
+        if (Input.GetButtonDown("Slide")) {
+            isSliding = true;
         }
     }
 
@@ -71,7 +84,12 @@ public class Player : MonoBehaviour {
         transform.localScale = scale;
     }
 
+    private void StopMoving() {
+        myRigidbody.velocity = Vector2.zero;
+    }
+
     private void ResetValues() {
         isAttacking = false;
+        isSliding = false;
     }
 }
