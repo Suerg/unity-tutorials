@@ -11,6 +11,7 @@ public class Player : MonoBehaviour {
     private bool isSliding;
     private bool isGrounded;
     private bool isJumping;
+    private bool isJumpAttacking;
 
     [SerializeField]
     private bool airControl;
@@ -88,10 +89,16 @@ public class Player : MonoBehaviour {
     }
 
     private void HandleAttacks() {
-       if (isAttacking && !IsPlayerAttack()) {
+       if (isAttacking && isGrounded && !IsPlayerAttack()) {
             myAnimator.SetTrigger("attack");
             StopMoving();
-        } 
+        } else if (isJumpAttacking
+            && !IsPlayerAttack() && !isGrounded) {
+            myAnimator.SetBool("jumpAttack", true);
+        }
+       if (!isJumpAttacking) {
+            myAnimator.SetBool("jumpAttack", false);
+        }
     }
 
     private void HandleInput() {
@@ -100,6 +107,7 @@ public class Player : MonoBehaviour {
         }
         if (Input.GetButtonDown("Melee")) {
             isAttacking = true;
+            isJumpAttacking = true;
         }
         if (Input.GetButtonDown("Slide")) {
             isSliding = true;
@@ -123,6 +131,7 @@ public class Player : MonoBehaviour {
         isAttacking = false;
         isSliding = false;
         isJumping = false;
+        isJumpAttacking = false;
     }
 
     private bool IsGrounded() {
