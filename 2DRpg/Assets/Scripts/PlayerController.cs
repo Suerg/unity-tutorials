@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    private Rigidbody2D myRigidbody;
     private Animator anim;
     private bool playerMoving;
     private Vector2 lastMove;
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour {
 	void Start () {
         anim = GetComponent<Animator>();
         lastMove = Vector2.zero;
+        myRigidbody = GetComponent<Rigidbody2D>();
 	}
 
     public void FixedUpdate() {
@@ -22,18 +24,27 @@ public class PlayerController : MonoBehaviour {
         float yAxis = Input.GetAxis("Vertical");
         playerMoving = false;
         if (xAxis > 0.1f || xAxis < -0.1f) {
-            transform.Translate(new Vector3(
-               xAxis * moveSpeed, 0, 0 
-            ));
+            //transform.Translate(new Vector3(
+            //   xAxis * moveSpeed, 0, 0 
+            //));
+            myRigidbody.velocity = new Vector2(xAxis * moveSpeed, 0f);
             playerMoving = true;
             lastMove = new Vector2(xAxis, 0f);
         }
         if (yAxis > 0.1f || yAxis < -0.1f) {
-            transform.Translate(new Vector3(
-               0, yAxis * moveSpeed, 0 
-            ));
+            //transform.Translate(new Vector3(
+            //   0, yAxis * moveSpeed, 0 
+            //));
+            myRigidbody.velocity = new Vector2(0f, yAxis * moveSpeed);
             playerMoving = true;
             lastMove = new Vector2(0f, yAxis);
+        }
+
+        if (xAxis < 0.1f && xAxis > -0.1f) {
+            myRigidbody.velocity = new Vector2(0f, myRigidbody.velocity.y);
+        }
+        if (yAxis < 0.1f && yAxis > -0.1f) {
+            myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, 0f);
         }
         anim.SetFloat("MoveX", xAxis);
         anim.SetFloat("MoveY", yAxis);
