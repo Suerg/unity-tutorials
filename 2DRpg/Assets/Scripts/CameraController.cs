@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour {
 
     private Vector3 targetPos;
+    private static bool cameraExists;
 
     [SerializeField]
     private GameObject followTarget;
@@ -13,8 +14,13 @@ public class CameraController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
-	}
+        if (!cameraExists) {
+            cameraExists = true;
+            DontDestroyOnLoad(transform.gameObject);
+        } else {
+            Destroy(gameObject);
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {

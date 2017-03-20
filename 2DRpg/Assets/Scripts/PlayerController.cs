@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
+    private static bool playerExists;
 
     private Rigidbody2D myRigidbody;
     private Animator anim;
     private bool playerMoving;
-    private Vector2 lastMove;
+
+    public Vector2 lastMove;
 
     [SerializeField]
     private float moveSpeed;
@@ -17,7 +19,14 @@ public class PlayerController : MonoBehaviour {
         anim = GetComponent<Animator>();
         lastMove = Vector2.zero;
         myRigidbody = GetComponent<Rigidbody2D>();
-	}
+
+        if (!playerExists) {
+            playerExists = true;
+            DontDestroyOnLoad(transform.gameObject);
+        } else {
+            Destroy(gameObject);
+        }
+    }
 
     public void FixedUpdate() {
         float xAxis = Input.GetAxis("Horizontal");
